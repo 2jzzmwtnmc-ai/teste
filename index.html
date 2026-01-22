@@ -22,20 +22,20 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  const endParam = params.get("end");      // YYYY-MM-DDTHH:mm:ss
-  const label = params.get("label") || ""; // texto opcional
+  const endParam = params.get("end");
+  const label = params.get("label") || "";
 
   if (label) document.getElementById("titulo").innerText = label;
 
   if (!endParam) {
     document.getElementById("contador").innerText = "data inválida";
-    throw new Error("Parâmetro end ausente");
+    return;
   }
 
   const endDate = new Date(endParam);
   if (isNaN(endDate.getTime())) {
     document.getElementById("contador").innerText = "data inválida";
-    throw new Error("Formato inválido");
+    return;
   }
 
   function atualizar(){
