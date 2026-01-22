@@ -24,7 +24,6 @@
 <div id="contador">carregando...</div>
 
 <script>
-  // 🔹 DATA FINAL
   const endDate = new Date("2026-02-01T18:00:00");
 
   function atualizar() {
@@ -33,10 +32,14 @@
 
     const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
     diff %= (1000 * 60 * 60 * 24);
+
     const horas = Math.floor(diff / (1000 * 60 * 60));
     diff %= (1000 * 60 * 60);
-    const min   = Math.floor(diff / (1000 * 60));
-    const seg   = Math.floor(diff / 1000);
+
+    const min = Math.floor(diff / (1000 * 60));
+    diff %= (1000 * 60);   // 🔴 ESSA LINHA FALTAVA
+
+    const seg = Math.floor(diff / 1000);
 
     document.getElementById("contador").innerText =
       `${dias}d ${horas}h ${min}m ${seg}s`;
@@ -46,5 +49,7 @@
   setInterval(atualizar, 1000);
 </script>
 
+
 </body>
 </html>
+
