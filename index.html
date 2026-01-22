@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Contador</title>
+  <title>Countdown</title>
   <style>
     body {
       margin: 0;
@@ -17,6 +17,9 @@
       font-size: 64px;
       font-weight: 600;
     }
+    .expired {
+      color: #d9534f;
+    }
   </style>
 </head>
 <body>
@@ -24,12 +27,26 @@
 <div id="contador">carregando...</div>
 
 <script>
-  // 🔹 DATA INICIAL
-  const startDate = new Date("2025-01-01T08:00:00");
+  // 🔹 Lê parâmetro ?end=
+  const params = new URLSearchParams(window.location.search);
+  const endParam = params.get("end");
+
+  if (!endParam) {
+    document.getElementById("contador").innerText = "data inválida";
+    throw new Error("Parâmetro ?end não informado");
+  }
+
+  const endDate = new Date(endParam);
 
   function atualizar() {
     const now = new Date();
-    let diff = Math.max(0, now - startDate);
+    let diff = endDate - now;
+
+    if (diff <= 0) {
+      document.getElementById("contador").innerText = "0d 0h 0m 0s";
+      document.getElementById("contador").classList.add("expired");
+      return;
+    }
 
     const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
     diff %= (1000 * 60 * 60 * 24);
