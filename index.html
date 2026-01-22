@@ -17,7 +17,7 @@
 
 <div id="wrap">
   <div id="titulo"></div>
-  <div id="contador">carregaaaando...</div>
+  <div id="contador">carregaaaando1...</div>
 </div>
 
 <script>
@@ -70,14 +70,20 @@
       dias + "d " + horas + "h " + min + "m " + seg + "s";
   }
 
-  atualizar();
-  setInterval(atualizar, 1000);
+  function loop() {
+    atualizar();
+    setTimeout(loop, 1000);
+  }
+
+  loop();
 </script>
+
 
 
 
 </body>
 </html>
+
 
 
 
