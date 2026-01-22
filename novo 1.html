@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Contador</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Calibri, Arial, sans-serif;
+      background: #ffffff;
+    }
+    #contador {
+      font-size: 64px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div id="contador">carregando...</div>
+
+<script>
+  // 🔹 DATA INICIAL
+  const startDate = new Date("2025-01-01T08:00:00");
+
+  function atualizar() {
+    const now = new Date();
+    let diff = Math.max(0, now - startDate);
+
+    const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff %= (1000 * 60 * 60 * 24);
+    const horas = Math.floor(diff / (1000 * 60 * 60));
+    diff %= (1000 * 60 * 60);
+    const min   = Math.floor(diff / (1000 * 60));
+    const seg   = Math.floor(diff / 1000);
+
+    document.getElementById("contador").innerText =
+      `${dias}d ${horas}h ${min}m ${seg}s`;
+  }
+
+  atualizar();
+  setInterval(atualizar, 1000);
+</script>
+
+</body>
+</html>
