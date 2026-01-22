@@ -57,9 +57,13 @@
       `${dias}d ${horas}h ${min}m ${seg}s`;
   }
 
-  atualizar();
-  setInterval(atualizar, 1000);
+  window.onload = function(){
+    atualizar();
+    setInterval(atualizar, 1000);
+  };
 </script>
+
 
 </body>
 </html>
+
