@@ -26,35 +26,32 @@
 <script>
   const params = new URLSearchParams(window.location.search);
 
-  // data final (obrigatória)
+  // DATA FINAL (obrigatória)
   const endDate = new Date(params.get("end"));
 
-  // data inicial (opcional – se não vier, usa now())
-  const startParam = params.get("start");
-  const startDate = startParam ? new Date(startParam) : new Date();
+  // DATA INICIAL (NOW VINDO DO PARÂMETRO)
+  const now = new Date(params.get("start"));
+
+  let diff = Math.max(0, endDate - now);
 
   function atualizar() {
-    const now = new Date();
+    let temp = diff;
 
-    // tempo passado desde o start
-    const elapsed = now - startDate;
+    const dias  = Math.floor(temp / (1000 * 60 * 60 * 24));
+    temp %= (1000 * 60 * 60 * 24);
 
-    // diferença real até o fim
-    let diff = Math.max(0, endDate - startDate - elapsed);
+    const horas = Math.floor(temp / (1000 * 60 * 60));
+    temp %= (1000 * 60 * 60);
 
-    const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
-    diff %= (1000 * 60 * 60 * 24);
+    const min = Math.floor(temp / (1000 * 60));
+    temp %= (1000 * 60);
 
-    const horas = Math.floor(diff / (1000 * 60 * 60));
-    diff %= (1000 * 60 * 60);
-
-    const min = Math.floor(diff / (1000 * 60));
-    diff %= (1000 * 60);
-
-    const seg = Math.floor(diff / 1000);
+    const seg = Math.floor(temp / 1000);
 
     document.getElementById("contador").innerText =
       `${dias}d ${horas}h ${min}m ${seg}s`;
+
+    diff = Math.max(0, diff - 1000); // decrementa 1 segundo
   }
 
   atualizar();
