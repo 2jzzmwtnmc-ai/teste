@@ -1,52 +1,23 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Countdown</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: Calibri, Arial, sans-serif;
-      background: #fff;
-    }
-    #contador {
-      font-size: 64px;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-
-<div id="contador">carregando...</div>
-
 <script>
   const params = new URLSearchParams(window.location.search);
+  const endParam = params.get("end");
 
-  let endDate;
-
-  // 🔹 OPÇÃO A: ?days=30
-  if (params.has("days")) {
-    const days = parseInt(params.get("days"), 10);
-    endDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  if (!endParam) {
+    document.getElementById("contador").innerText = "parâmetro end ausente";
+    throw new Error("end não informado");
   }
 
-  // 🔹 OPÇÃO B: ?end=2025-02-20T18:00:00
-  if (params.has("end")) {
-    endDate = new Date(params.get("end"));
-  }
+  // ✅ ISO 8601: YYYY-MM-DDTHH:mm:ss
+  const endDate = new Date(endParam);
 
-  if (!endDate || isNaN(endDate)) {
-    document.getElementById("contador").innerText = "parâmetro inválido";
-    throw new Error("Informe ?days= ou ?end=");
+  if (isNaN(endDate.getTime())) {
+    document.getElementById("contador").innerText = "data inválida";
+    throw new Error("formato de data inválido");
   }
 
   function atualizar() {
     const now = new Date();
-    let diffMs = endDate - now;
+    let diffMs = endDate.getTime() - now.getTime();
 
     if (diffMs <= 0) {
       document.getElementById("contador").innerText = "0d 0h 0m 0s";
@@ -67,6 +38,3 @@
   atualizar();
   setInterval(atualizar, 1000);
 </script>
-
-</body>
-</html>
