@@ -24,7 +24,9 @@
 <div id="contador">carregando...</div>
 
 <script>
-  const endDate = new Date("2026-02-01T18:00:00");
+  const endDate = new Date(
+  new URLSearchParams(window.location.search).get("end")
+    );
 
   function atualizar() {
     const now = new Date();
@@ -52,4 +54,5 @@
 
 </body>
 </html>
+
 
