@@ -1,13 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Calibri, Arial, sans-serif;
+      background: #fff;
+    }
+    #contador {
+      font-size: 64px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div id="contador">carregando...</div>
+
 <script>
   const params = new URLSearchParams(window.location.search);
-  const endParam = params.get("end");
 
-  if (!endParam) {
-    document.getElementById("contador").innerText = "data inválida";
-    throw new Error("Parâmetro ?end não informado");
+  let endDate;
+
+  // 🔹 OPÇÃO A: ?days=30
+  if (params.has("days")) {
+    const days = parseInt(params.get("days"), 10);
+    endDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
   }
 
-  const endDate = new Date(endParam);
+  // 🔹 OPÇÃO B: ?end=2025-02-20T18:00:00
+  if (params.has("end")) {
+    endDate = new Date(params.get("end"));
+  }
+
+  if (!endDate || isNaN(endDate)) {
+    document.getElementById("contador").innerText = "parâmetro inválido";
+    throw new Error("Informe ?days= ou ?end=");
+  }
 
   function atualizar() {
     const now = new Date();
@@ -32,3 +67,6 @@
   atualizar();
   setInterval(atualizar, 1000);
 </script>
+
+</body>
+</html>
