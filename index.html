@@ -4,86 +4,47 @@
   <meta charset="UTF-8">
   <title>Countdown</title>
   <style>
-    body{
-      margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
-      font-family:Calibri,Arial,sans-serif;background:#fff;
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Calibri, Arial, sans-serif;
+      background: #ffffff;
     }
-    #wrap{text-align:center}
-    #titulo{font-size:24px;margin-bottom:8px;color:#555}
-    #contador{font-size:64px;font-weight:600}
+    #contador {
+      font-size: 64px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
 
-<div id="wrap">
-  <div id="titulo"></div>
-  <div id="contador">carregaaaando1...</div>
-</div>
+<div id="contador">carregando...</div>
 
 <script>
-  function getParam(name) {
-    var query = window.location.search.substring(1);
-    var vars = query.split("&");
-    for (var i = 0; i < vars.length; i++) {
-      var pair = vars[i].split("=");
-      if (decodeURIComponent(pair[0]) === name) {
-        return decodeURIComponent(pair[1]);
-      }
-    }
-    return null;
-  }
-
-  var endParam = getParam("end");
-  var label = getParam("label");
-
-  if (label) {
-    document.getElementById("titulo").innerText = label;
-  }
-
-  if (!endParam) {
-    document.getElementById("contador").innerText = "data inválida";
-    return;
-  }
-
-  var endDate = new Date(endParam);
-  if (isNaN(endDate.getTime())) {
-    document.getElementById("contador").innerText = "data inválida";
-    return;
-  }
+  // 🔹 DATA FINAL
+  const endDate = new Date("2026-02-01T18:00:00");
 
   function atualizar() {
-    var now = new Date();
-    var diffMs = endDate.getTime() - now.getTime();
+    const now = new Date();
+    let diff = Math.max(0, endDate - now);
 
-    if (diffMs <= 0) {
-      document.getElementById("contador").innerText = "0d 0h 0m 0s";
-      return;
-    }
-
-    var totalSeconds = Math.floor(diffMs / 1000);
-    var dias  = Math.floor(totalSeconds / 86400);
-    var horas = Math.floor((totalSeconds % 86400) / 3600);
-    var min   = Math.floor((totalSeconds % 3600) / 60);
-    var seg   = totalSeconds % 60;
+    const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff %= (1000 * 60 * 60 * 24);
+    const horas = Math.floor(diff / (1000 * 60 * 60));
+    diff %= (1000 * 60 * 60);
+    const min   = Math.floor(diff / (1000 * 60));
+    const seg   = Math.floor(diff / 1000);
 
     document.getElementById("contador").innerText =
-      dias + "d " + horas + "h " + min + "m " + seg + "s";
+      `${dias}d ${horas}h ${min}m ${seg}s`;
   }
 
-  function loop() {
-    atualizar();
-    setTimeout(loop, 1000);
-  }
-
-  loop();
+  atualizar();
+  setInterval(atualizar, 1000);
 </script>
-
-
-
 
 </body>
 </html>
-
-
-
-
