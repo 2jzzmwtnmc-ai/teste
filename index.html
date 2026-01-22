@@ -24,13 +24,23 @@
 <div id="contador">carregando...</div>
 
 <script>
-  const endDate = new Date(
-  new URLSearchParams(window.location.search).get("end")
-    );
+  const params = new URLSearchParams(window.location.search);
+
+  // data final (obrigatória)
+  const endDate = new Date(params.get("end"));
+
+  // data inicial (opcional – se não vier, usa now())
+  const startParam = params.get("start");
+  const startDate = startParam ? new Date(startParam) : new Date();
 
   function atualizar() {
     const now = new Date();
-    let diff = Math.max(0, endDate - now);
+
+    // tempo passado desde o start
+    const elapsed = now - startDate;
+
+    // diferença real até o fim
+    let diff = Math.max(0, endDate - startDate - elapsed);
 
     const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
     diff %= (1000 * 60 * 60 * 24);
@@ -39,7 +49,7 @@
     diff %= (1000 * 60 * 60);
 
     const min = Math.floor(diff / (1000 * 60));
-    diff %= (1000 * 60);   // 🔴 ESSA LINHA FALTAVA
+    diff %= (1000 * 60);
 
     const seg = Math.floor(diff / 1000);
 
@@ -51,8 +61,5 @@
   setInterval(atualizar, 1000);
 </script>
 
-
 </body>
 </html>
-
-
