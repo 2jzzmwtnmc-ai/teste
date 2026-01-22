@@ -1,21 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown</title>
+  <style>
+    body{
+      margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+      font-family:Calibri,Arial,sans-serif;background:#fff;
+    }
+    #wrap{text-align:center}
+    #titulo{font-size:24px;margin-bottom:8px;color:#555}
+    #contador{font-size:64px;font-weight:600}
+  </style>
+</head>
+<body>
+
+<div id="wrap">
+  <div id="titulo"></div>
+  <div id="contador">carregando...</div>
+</div>
+
 <script>
   const params = new URLSearchParams(window.location.search);
-  const endParam = params.get("end");
+  const endParam = params.get("end");      // YYYY-MM-DDTHH:mm:ss
+  const label = params.get("label") || ""; // texto opcional
+
+  if (label) document.getElementById("titulo").innerText = label;
 
   if (!endParam) {
-    document.getElementById("contador").innerText = "parâmetro end ausente";
-    throw new Error("end não informado");
+    document.getElementById("contador").innerText = "data inválida";
+    throw new Error("Parâmetro end ausente");
   }
 
-  // ✅ ISO 8601: YYYY-MM-DDTHH:mm:ss
   const endDate = new Date(endParam);
-
   if (isNaN(endDate.getTime())) {
     document.getElementById("contador").innerText = "data inválida";
-    throw new Error("formato de data inválido");
+    throw new Error("Formato inválido");
   }
 
-  function atualizar() {
+  function atualizar(){
     const now = new Date();
     let diffMs = endDate.getTime() - now.getTime();
 
@@ -25,7 +48,6 @@
     }
 
     const totalSeconds = Math.floor(diffMs / 1000);
-
     const dias  = Math.floor(totalSeconds / 86400);
     const horas = Math.floor((totalSeconds % 86400) / 3600);
     const min   = Math.floor((totalSeconds % 3600) / 60);
@@ -38,3 +60,6 @@
   atualizar();
   setInterval(atualizar, 1000);
 </script>
+
+</body>
+</html>
