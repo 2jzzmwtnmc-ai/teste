@@ -1,37 +1,15 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Countdown</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #ffffff;
-    }
-    #contador {
-      font-size: 40vh;
-      font-weight: 600;
-      color: #707070;
-    }
-  </style>
-</head>
-<body>
-
-<div id="contador">carregando...</div>
-
 <script>
   const params = new URLSearchParams(window.location.search);
 
-  // DATA FINAL (obrigatória)
+  // Datas
   const endDate = new Date(params.get("end"));
+  const now     = new Date(params.get("start"));
 
-  // DATA INICIAL (NOW VINDO DO PARÂMETRO)
-  const now = new Date(params.get("start"));
+  // Parâmetros de horas (fallback se não vier nada)
+  const GREEN_LIMIT  = Number(params.get("green"))  || 10;
+  const YELLOW_LIMIT = Number(params.get("yellow")) || 5;
+
+  const contador = document.getElementById("contador");
 
   let diff = Math.max(0, endDate - now);
 
@@ -49,22 +27,23 @@
 
     const seg = Math.floor(temp / 1000);
 
-    document.getElementById("contador").innerText =
-      `${dias}d ${horas}h ${min}m ${seg}s`;
+    contador.innerText = `${dias}d ${horas}h ${min}m ${seg}s`;
 
-    diff = Math.max(0, diff - 1000); // decrementa 1 segundo
+    // 🔥 TOTAL DE HORAS RESTANTES (decimal)
+    const totalHoras = diff / (1000 * 60 * 60);
+
+    // 🎨 LÓGICA DE CORES
+    if (totalHoras < YELLOW_LIMIT) {
+      contador.style.color = "#E53935"; // vermelho
+    } else if (totalHoras < GREEN_LIMIT) {
+      contador.style.color = "#FBC02D"; // amarelo
+    } else {
+      contador.style.color = "#707070"; // padrão
+    }
+
+    diff = Math.max(0, diff - 1000);
   }
 
   atualizar();
   setInterval(atualizar, 1000);
 </script>
-
-</body>
-</html>
-
-
-
-
-
-
-
