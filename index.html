@@ -1,38 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Countdown</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #ffffff;
+    }
+
+    #contador {
+      font-size: 40vh;
+      font-weight: 600;
+      color: #707070; /* cor padrão */
+    }
+  </style>
+</head>
+<body>
+
+<div id="contador">carregando...</div>
+
 <script>
   const params = new URLSearchParams(window.location.search);
 
-  // Datas
-  const endDate = new Date(params.get("end"));
-  const now     = new Date(params.get("start"));
+  // === PARÂMETROS ===
+  const endParam   = params.get("end");
+  const startParam = params.get("start");
 
-  // Parâmetros de horas (fallback se não vier nada)
+  if (!endParam) {
+    document.getElementById("contador").innerText = "Parâmetro END ausente";
+    throw new Error("Parâmetro 'end' é obrigatório");
+  }
+
+  const endDate = new Date(endParam);
+  let current   = startParam ? new Date(startParam) : new Date();
+
   const GREEN_LIMIT  = Number(params.get("green"))  || 10;
   const YELLOW_LIMIT = Number(params.get("yellow")) || 5;
 
   const contador = document.getElementById("contador");
 
-  let diff = Math.max(0, endDate - now);
-
   function atualizar() {
-    let temp = diff;
+    let diff = endDate - current;
+    if (diff < 0) diff = 0;
 
-    const dias  = Math.floor(temp / (1000 * 60 * 60 * 24));
-    temp %= (1000 * 60 * 60 * 24);
-
-    const horas = Math.floor(temp / (1000 * 60 * 60));
-    temp %= (1000 * 60 * 60);
-
-    const min = Math.floor(temp / (1000 * 60));
-    temp %= (1000 * 60);
-
-    const seg = Math.floor(temp / 1000);
+    // === CÁLCULO DE TEMPO ===
+    const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const min   = Math.floor((diff / (1000 * 60)) % 60);
+    const seg   = Math.floor((diff / 1000) % 60);
 
     contador.innerText = `${dias}d ${horas}h ${min}m ${seg}s`;
 
-    // 🔥 TOTAL DE HORAS RESTANTES (decimal)
+    // === HORAS TOTAIS (REGRA CORRETA) ===
     const totalHoras = diff / (1000 * 60 * 60);
 
-    // 🎨 LÓGICA DE CORES
+    // === CORES ===
     if (totalHoras < YELLOW_LIMIT) {
       contador.style.color = "#E53935"; // vermelho
     } else if (totalHoras < GREEN_LIMIT) {
@@ -41,9 +69,13 @@
       contador.style.color = "#707070"; // padrão
     }
 
-    diff = Math.max(0, diff - 1000);
+    // avança o "relógio" em 1s
+    current = new Date(current.getTime() + 1000);
   }
 
   atualizar();
   setInterval(atualizar, 1000);
 </script>
+
+</body>
+</html>
