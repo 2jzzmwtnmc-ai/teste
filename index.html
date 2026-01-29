@@ -13,11 +13,10 @@
       font-family: "Segoe UI", Arial, sans-serif;
       background: #ffffff;
     }
-
     #contador {
-      font-size: 40vh;
+      font-size: 30vh;
       font-weight: 600;
-      color: #707070; /* cor padrão */
+      color: #707070;
     }
   </style>
 </head>
@@ -27,49 +26,50 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
+  const contador = document.getElementById("contador");
 
-  // === PARÂMETROS ===
-  const endParam   = params.get("end");
-  const startParam = params.get("start");
-
-  if (!endParam) {
-    document.getElementById("contador").innerText = "Parâmetro END ausente";
-    throw new Error("Parâmetro 'end' é obrigatório");
+  function parseDate(param) {
+    if (!param) return null;
+    const decoded = decodeURIComponent(param);
+    const d = new Date(decoded);
+    return isNaN(d.getTime()) ? null : d;
   }
 
-  const endDate = new Date(endParam);
-  let current   = startParam ? new Date(startParam) : new Date();
+  const endDate   = parseDate(params.get("end"));
+  const startDate = parseDate(params.get("start")) || new Date();
+
+  if (!endDate) {
+    contador.innerText = "Data END inválida";
+    contador.style.color = "red";
+    throw new Error("END inválido");
+  }
 
   const GREEN_LIMIT  = Number(params.get("green"))  || 10;
   const YELLOW_LIMIT = Number(params.get("yellow")) || 5;
 
-  const contador = document.getElementById("contador");
+  let current = startDate;
 
   function atualizar() {
     let diff = endDate - current;
     if (diff < 0) diff = 0;
 
-    // === CÁLCULO DE TEMPO ===
-    const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const min   = Math.floor((diff / (1000 * 60)) % 60);
-    const seg   = Math.floor((diff / 1000) % 60);
+    const dias  = Math.floor(diff / 86400000);
+    const horas = Math.floor((diff % 86400000) / 3600000);
+    const min   = Math.floor((diff % 3600000) / 60000);
+    const seg   = Math.floor((diff % 60000) / 1000);
 
     contador.innerText = `${dias}d ${horas}h ${min}m ${seg}s`;
 
-    // === HORAS TOTAIS (REGRA CORRETA) ===
-    const totalHoras = diff / (1000 * 60 * 60);
+    const totalHoras = diff / 3600000;
 
-    // === CORES ===
     if (totalHoras < YELLOW_LIMIT) {
-      contador.style.color = "#E53935"; // vermelho
+      contador.style.color = "#E53935";
     } else if (totalHoras < GREEN_LIMIT) {
-      contador.style.color = "#FBC02D"; // amarelo
+      contador.style.color = "#FBC02D";
     } else {
-      contador.style.color = "#707070"; // padrão
+      contador.style.color = "#707070";
     }
 
-    // avança o "relógio" em 1s
     current = new Date(current.getTime() + 1000);
   }
 
