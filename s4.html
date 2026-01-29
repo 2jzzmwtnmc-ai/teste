@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>S/4HANA Cutover Command Center - ITC1</title>
+  <style>
+    :root {
+      /* Palette based on your V2 design */
+		--primary-color: #0A1931; /* Dark Navy */
+		--text-color: #333333;
+		--bg-color: #F4F7F6;	  
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --navy: #0F2A44;
+      --blue: #2C74B3;
+      --teal: #2BA6A6;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --green: #10b981;
+      --gray-light: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    
+    body { 
+	       background-color:   var(--bg); 
+		   color: var(--text-main); 
+		   padding-bottom: 40px; 
+		   font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+		   
+	}
+
+    /* --- HEADER --- */
+    header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header-title span {
+            font-size: 12px;
+            opacity: 0.8;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .refresh-badge {
+            background-color: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Estilo do Dropdown de Timezone */
+        .header-selector select {
+            padding: 6px;
+            border-radius: 4px;
+            border: none;
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .header-selector label {
+            font-size: 10px; 
+            display: block; 
+            opacity: 0.8; 
+            margin-bottom: 2px;
+            text-align: right;
+        }
+
+        /* Estilo do Dropdown de Timezone */
+        .timezone-selector select {
+            padding: 6px;
+            border-radius: 4px;
+            border: none;
+            background-color: #f0f0f0;
+            color: #333;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .timezone-selector label {
+            font-size: 10px; 
+            display: block; 
+            opacity: 0.8; 
+            margin-bottom: 2px;
+            text-align: right;
+        }
+
+
+    .status-dot { width: 8px; height: 8px; background-color: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+
+    /* --- TABS --- */
+    .tabs-container {
+      background: white;
+      padding: 0 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .tab-btn {
+      padding: 1rem 0;
+      background: none;
+      border: none;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--navy); }
+    .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+
+    /* --- LAYOUT --- */
+    .container { max-width: 1400px; margin: 2rem auto; padding: 0 1rem; }
+    .grid-dashboard { display: grid; gap: 1.5rem; }
+    .grid-2 { grid-template-columns: 2fr 1fr; } /* Main chart vs Side panel */
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+    /* --- CARDS --- */
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9fafb;
+    }
+    .card-title { font-size: 0.95rem; font-weight: 600; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-body { padding: 1.5rem; flex-grow: 1; }
+
+    /* --- KPI STATS --- */
+    .kpi-row { display: flex; justify-content: space-between; align-items: flex-end; }
+    .kpi-value { font-size: 2.5rem; font-weight: 700; color: var(--navy); line-height: 1; }
+    .kpi-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .kpi-sub { font-size: 0.85rem; font-weight: 500; }
+    .trend-up { color: var(--green); }
+    .trend-down { color: var(--red); }
+
+    /* --- GANTT/BAR CHART SIMULATION --- */
+    .subphase-row { margin-bottom: 1.25rem; }
+    .subphase-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; font-weight: 500; }
+    .progress-track {
+      height: 24px;
+      background-color: #f3f4f6;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* The Actual Progress Bar */
+    .bar-actual {
+      height: 100%;
+      background-color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      position: absolute;
+      top: 0; left: 0; z-index: 2;
+    }
+    /* The Time Elapsed Marker (Ghost Bar) */
+    .bar-elapsed {
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(0,0,0,0.05),
+        rgba(0,0,0,0.05) 10px,
+        rgba(0,0,0,0.1) 10px,
+        rgba(0,0,0,0.1) 20px
+      );
+      position: absolute;
+      top: 0; left: 0; z-index: 1;
+      border-right: 2px dashed #9ca3af;
+    }
+    /* Status indicators */
+    .status-ok { background-color: var(--green); }
+    .status-warn { background-color: var(--amber); }
+    .status-late { background-color: var(--red); }
+
+    /* --- TABLES --- */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; padding: 0.75rem 1rem; background: #f9fafb; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    
+    .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-late { background: #fee2e2; color: #991b1b; }
+    .badge-soon { background: #e0f2fe; color: #075985; }
+    .badge-done { background: #dcfce7; color: #166534; }
+
+    /* --- HELPERS --- */
+    .hidden { display: none; }
+    .text-sm { font-size: 0.85rem; }
+    .mt-4 { margin-top: 1rem; }
+    
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+  </style>
+</head>
+<body>
+
+ <header>
+      <div class="header-title">
+            <h1>S/4HANA Cutover Command Center</h1>
+            <span>Phase: <strong id="phase-display">Go-Live (Cycle 1)</strong> | Status: 🟢 On Track</span>
+        </div>
+        <div class="header-controls">
+            
+            <div class="header-selector">
+                <label for="phaseSelect">Select Phase:</label>
+                <select id="phaseSelect" onchange="updatePhase()">
+                    <option value="Go-Live (Cycle 1)">Go-Live</option>
+                    <option value="UAT (Cycle 3)">UAT</option>
+                </select>
+            </div>
+		
+            <div class="timezone-selector">
+                <label for="timezone">Country  (Display Timezone):</label>
+                <select id="timezone" onchange="updateTimezone()">
+                    <option value="MST">Project Time (MST)</option>
+                    <option value="AEST">Australia (AEST)</option>
+                    <option value="CST">Mexico (CST)</option>
+                </select>
+            </div>
+            <div class="refresh-badge">Last updated: 2 min ago</div>
+        </div>
+    </header>
+
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab('exec')">1. Executive Overview</button>
+    <button class="tab-btn" onclick="switchTab('ops')">2. Operational War Room</button>
+    <button class="tab-btn" onclick="switchTab('data')">3. Data Health & QA</button>
+  </div>
+
+  <div class="container">
+
+    <div id="tab-exec" class="tab-content grid-dashboard">
+      
+      <div class="grid-dashboard grid-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="kpi-label">Phase Progress (Weighted)</div>
+            <div class="kpi-row">
+              <div class="kpi-value">42%</div>
+              <div class="kpi-sub trend-up">On Track</div>
+            </div>
+            <div class="progress-track" style="height:6px; margin-top:10px;">
+              <div class="bar-actual status-ok" style="width: 42%;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-body">
+            <div class="kpi-label">Time Elapsed (Phase Window)</div>
+            <div class="kpi-row">
+              <div class="kpi-value">45%</div>
+              <div class="kpi-sub" style="color: var(--text-muted)">Day 2 of 5</div>
+            </div>
+             <div class="progress-track" style="height:6px; margin-top:10px;">
+              <div class="bar-actual" style="width: 45%; background: #9ca3af;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="kpi-label">Tasks Completed</div>
+            <div class="kpi-row">
+              <div class="kpi-value">124</div>
+              <div class="kpi-sub">/ 295 Total</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-left: 4px solid var(--red);">
+          <div class="card-body">
+            <div class="kpi-label">Critical Delays</div>
+            <div class="kpi-row">
+              <div class="kpi-value" style="color: var(--red)">3</div>
+              <div class="kpi-sub trend-down">Blockers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-dashboard grid-2">
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Sub-Phase Execution (Real vs. Planned Window)</span>
+            <span class="text-sm text-muted">Updates every 10 min</span>
+          </div>
+          <div class="card-body">
+            
+            <div class="subphase-row">
+              <div class="subphase-header">
+                <span>01- Prep</span>
+                <span style="color:var(--green)">100% Complete</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-actual status-ok" style="width: 100%;">DONE</div>
+                <div class="bar-elapsed" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div class="subphase-row">
+              <div class="subphase-header">
+                <span>02- Pre-Downtime</span>
+                <span>85% (Exp: 80%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-elapsed" style="width: 80%;"></div>
+                <div class="bar-actual status-ok" style="width: 85%;">85%</div>
+              </div>
+            </div>
+
+            <div class="subphase-row">
+              <div class="subphase-header">
+                <span style="color: var(--red); font-weight:bold;">03 - Load & Validate Stage 1</span>
+                <span style="color: var(--red)">15% (Exp: 40%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-elapsed" style="width: 40%;"></div>
+                <div class="bar-actual status-late" style="width: 15%;">15%</div>
+              </div>
+              <div class="text-sm" style="color: var(--red); margin-top:4px;">⚠️ Behind schedule by ~3 hours</div>
+            </div>
+
+            <div class="subphase-row" style="opacity: 0.5;">
+              <div class="subphase-header">
+                <span>04 - Load & Validate Stage 2</span>
+                <span>Not Started</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-elapsed" style="width: 0%;"></div>
+              </div>
+            </div>
+            <div class="subphase-row" style="opacity: 0.5;">
+              <div class="subphase-header">
+                <span>05 - Smoke Test</span>
+                <span>Not Started</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-elapsed" style="width: 0%;"></div>
+              </div>
+            </div>
+			
+			<div class="subphase-row" style="opacity: 0.5;">
+              <div class="subphase-header">
+                <span>06 - Hypercare</span>
+                <span>Not Started</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-elapsed" style="width: 0%;"></div>
+              </div>
+            </div>
+
+			<div class="subphase-row" style="opacity: 0.5;">
+              <div class="subphase-header">
+                <span>07 - BAU</span>
+                <span>Not Started</span>
+              </div>
+              <div class="progress-track">
+                <div class="bar-elapsed" style="width: 0%;"></div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" style="background: #fee2e2;">
+            <span class="card-title" style="color: #991b1b;">⚠️ Overdue Activities (Action Required)</span>
+            <span class="badge badge-late">Total: 7</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Sub-Phase</th>
+                  <th>Primary Resource</th>
+                  <th>Status</th>
+                  <th>Delay</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Verify RFC Connections</b></td>
+                  <td>03-A Downtime</td>
+                  <td style="color: var(--blue); font-weight:600;">Michael Hewes (Basis)</td>
+                  <td><span class="badge badge-late">Not Started</span></td>
+                  <td>+145 min</td>
+                </tr>
+                <tr>
+                  <td>Upload Finance Master Data</td>
+                  <td>03-A Downtime</td>
+                  <td style="color: var(--blue); font-weight:600;">Kiersten Sommers (FI)</td>
+                  <td><span class="badge badge-late">In Progress</span></td>
+                  <td>+45 min</td>
+                </tr>
+                <tr>
+                  <td>Check IDoc Ports</td>
+                  <td>02 Integration</td>
+                  <td style="color: var(--blue); font-weight:600;">Justin Gaskin</td>
+                  <td><span class="badge badge-late">Not Started</span></td>
+                  <td>+10 min</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="tab-ops" class="tab-content grid-dashboard hidden">
+      
+      <div class="grid-dashboard grid-2">
+        
+        <div class="card">
+          <div class="card-header" style="background: #fee2e2;">
+            <span class="card-title" style="color: #991b1b;">⚠️ Overdue Activities (Action Required)</span>
+            <span class="badge badge-late">Total: 7</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Sub-Phase</th>
+                  <th>Primary Resource</th>
+                  <th>Status</th>
+                  <th>Delay</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Verify RFC Connections</b></td>
+                  <td>03-A Downtime</td>
+                  <td style="color: var(--blue); font-weight:600;">Michael Hewes (Basis)</td>
+                  <td><span class="badge badge-late">Not Started</span></td>
+                  <td>+145 min</td>
+                </tr>
+                <tr>
+                  <td>Upload Finance Master Data</td>
+                  <td>03-A Downtime</td>
+                  <td style="color: var(--blue); font-weight:600;">Kiersten Sommers (FI)</td>
+                  <td><span class="badge badge-late">In Progress</span></td>
+                  <td>+45 min</td>
+                </tr>
+                <tr>
+                  <td>Check IDoc Ports</td>
+                  <td>02 Integration</td>
+                  <td style="color: var(--blue); font-weight:600;">Justin Gaskin</td>
+                  <td><span class="badge badge-late">Not Started</span></td>
+                  <td>+10 min</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" style="background: #e0f2fe;">
+            <span class="card-title" style="color: #075985;">Next 2 Hours (Get Ready)</span>
+          </div>
+           <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Start Time</th>
+                  <th>Task</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>14:00 (in 15m)</td>
+                  <td>Smoke Test Login</td>
+                  <td>Test Team</td>
+                </tr>
+                <tr>
+                  <td>14:30</td>
+                  <td>Release Transport W5_001</td>
+                  <td>Basis Team</td>
+                </tr>
+                <tr>
+                  <td>15:00</td>
+                  <td>User Lock Validation</td>
+                  <td>Security</td>
+                </tr>
+                 <tr>
+                  <td>15:15</td>
+                  <td>Start Batch Job X99</td>
+                  <td>Basis Team</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <span class="card-title">Activity Volume by Team (Current Sub-Phase)</span>
+        </div>
+        <div class="card-body">
+          <div style="display:flex; gap: 2rem; align-items:flex-end; height: 150px; padding-bottom:10px; border-bottom:1px solid #eee;">
+            <div style="width:50px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center;">
+              <div style="width:30px; height:80%; background:var(--blue); border-radius:4px 4px 0 0;"></div>
+              <span class="text-sm mt-4">Basis</span>
+            </div>
+            <div style="width:50px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center;">
+              <div style="width:30px; height:40%; background:var(--teal); border-radius:4px 4px 0 0;"></div>
+              <span class="text-sm mt-4">FI</span>
+            </div>
+             <div style="width:50px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center;">
+              <div style="width:30px; height:20%; background:var(--gray-light); border-radius:4px 4px 0 0;"></div>
+              <span class="text-sm mt-4">BI</span>
+            </div>
+             <div style="width:50px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center;">
+              <div style="width:30px; height:90%; background:var(--red); border-radius:4px 4px 0 0;"></div>
+              <span class="text-sm mt-4">Sec</span>
+            </div>
+          </div>
+          <div class="text-sm text-muted mt-4">Note: Security team has high volume pending in the next 3 hours.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="tab-data" class="tab-content hidden">
+      <div class="card" style="border-top: 4px solid var(--amber);">
+        <div class="card-header">
+          <span class="card-title">Data Quality Issues</span>
+          <span class="badge status-warn">Requires Excel Fix</span>
+        </div>
+        <div class="card-body">
+          <p class="text-muted" style="margin-bottom:1rem;">The dashboard cannot calculate status for these items because data is missing or invalid in the master spreadsheet.</p>
+          
+          <div class="grid-dashboard grid-3">
+            <div style="padding:1rem; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px;">
+              <div style="font-size:2rem; font-weight:bold; color:var(--amber);">12</div>
+              <div class="text-sm font-bold">Rows with Missing Dates</div>
+              <div class="text-sm text-muted">Formula overwritten with blank?</div>
+            </div>
+
+             <div style="padding:1rem; background:#fffbeb; border:1px solid #fcd34d; border-radius:6px;">
+              <div style="font-size:2rem; font-weight:bold; color:var(--amber);">4</div>
+              <div class="text-sm font-bold">Invalid Statuses</div>
+              <div class="text-sm text-muted">E.g. "Doing" instead of "In Progress"</div>
+            </div>
+
+             <div style="padding:1rem; background:#f3f4f6; border:1px solid #d1d5db; border-radius:6px;">
+              <div style="font-size:2rem; font-weight:bold; color:#374151;">98%</div>
+              <div class="text-sm font-bold">Data Quality Score</div>
+              <div class="text-sm text-muted">Target: 100%</div>
+            </div>
+          </div>
+
+          <table class="mt-4">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Task Name</th>
+                <th>Issue Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1024</td>
+                <td>Validate Tax Codes</td>
+                <td style="color:var(--red)">Start Date is empty</td>
+              </tr>
+              <tr>
+                <td>1055</td>
+                <td>Check Interfaces</td>
+                <td style="color:var(--red)">Status "Almost Done" is invalid</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(tabName) {
+      // Hide all content
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      // Remove active class from buttons
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      // Show selected content
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      // Add active class to clicked button
+      event.target.classList.add('active');
+    }
+	
+	        // Função para atualizar o texto da Fase no título
+        function updatePhase() {
+            const phase = document.getElementById('phaseSelect').value;
+            const phaseLabel = document.getElementById('phase-display');
+            if(phaseLabel) phaseLabel.innerText = phase;
+        }
+	
+	// --- NOVA FUNÇÃO PARA O CABEÇALHO ---
+        function updateTimezone() {
+            const tz = document.getElementById('timezone').value;
+            const label = document.getElementById('time-label');
+            const timeCells = document.querySelectorAll('.time-cell'); // Precisa adicionar a classe time-cell nas TDS
+            
+            if(label) label.innerText = tz;
+
+            // Simulação visual da troca de horário
+            if (tz === 'AEST') {
+                if(timeCells.length > 0) timeCells[0].innerText = "06:00 (Tomorrow)";
+                if(timeCells.length > 1) timeCells[1].innerText = "06:30";
+                if(timeCells.length > 2) timeCells[2].innerText = "07:00";
+            } else if (tz === 'CST') {
+                if(timeCells.length > 0) timeCells[0].innerText = "15:00 (Today)";
+                if(timeCells.length > 1) timeCells[1].innerText = "15:30";
+                if(timeCells.length > 2) timeCells[2].innerText = "16:00";
+            } else {
+                // Volta para MST
+                if(timeCells.length > 0) timeCells[0].innerText = "14:00 (Today)";
+                if(timeCells.length > 1) timeCells[1].innerText = "14:30";
+                if(timeCells.length > 2) timeCells[2].innerText = "15:00";
+            }
+        }
+  </script>
+
+</body>
+</html>
