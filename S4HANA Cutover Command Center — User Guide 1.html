@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S/4HANA Cutover Command Center - User Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sap-blue: #1d2d50;
+            --sap-accent: #0a6ed1;
+            --sap-bg: #f4f7f9;
+            --sap-red: #bb0000;
+        }
+        body {
+            font-family: '72', '72full', Arial, Helvetica, sans-serif;
+            background-color: var(--sap-bg);
+            color: #32363a;
+            scroll-behavior: smooth;
+        }
+        .sidebar {
+            background-color: var(--sap-blue);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+        }
+        .nav-link {
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--sap-accent);
+        }
+        .content-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            padding: 2rem;
+        }
+        .img-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            background: #fff;
+        }
+        .img-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .alert-box {
+            border-left: 4px solid var(--sap-red);
+            background-color: #fff8f8;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row">
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar w-full md:w-64 text-white flex-shrink-0 p-6 hidden md:block">
+        <div class="mb-8">
+            <h1 class="text-xl font-bold border-b border-blue-400 pb-2">Command Center</h1>
+            <p class="text-xs text-blue-300 mt-1 uppercase tracking-widest">User Guide (Production)</p>
+        </div>
+        <ul class="space-y-2 text-sm">
+            <li><a href="#about" class="nav-link block p-2">1. About Dashboard</a></li>
+            <li><a href="#datasource" class="nav-link block p-2">2. Data Source</a></li>
+            <li><a href="#fields" class="nav-link block p-2">3. Required Fields</a></li>
+            <li><a href="#tasks" class="nav-link block p-2">4. Included Tasks</a></li>
+            <li><a href="#uat" class="nav-link block p-2">5. UAT Stage</a></li>
+            <li><a href="#status" class="nav-link block p-2">6. Status Rules</a></li>
+            <li><a href="#links" class="nav-link block p-2 text-yellow-400 font-bold">7. Access Links</a></li>
+            <li><a href="#overview" class="nav-link block p-2">8. Executive Overview</a></li>
+            <li><a href="#qa" class="nav-link block p-2">9. Data Health & QA</a></li>
+            <li><a href="#best-practices" class="nav-link block p-2 text-green-400">10. Best Practices</a></li>
+            <li><a href="#troubleshoot" class="nav-link block p-2">11. Troubleshooting</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-10 max-w-6xl">
+        
+        <!-- Header Section -->
+        <header class="mb-10">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800">S/4HANA Cutover Command Center</h2>
+                    <p class="text-lg text-gray-600 mt-2">Professional Execution Status Monitoring</p>
+                </div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/SAP_2011_logo.svg" alt="SAP Logo" class="h-8 hidden sm:block">
+            </div>
+        </header>
+
+        <!-- Section 1 -->
+        <section id="about" class="content-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center"><i class="fas fa-info-circle mr-2 text-blue-600"></i> 1) What this dashboard is</h3>
+            <p class="mb-4">The S/4HANA Cutover Command Center is a <strong>Qlik dashboard</strong> that provides real-time execution status of cutover activities. All data is managed in a central Excel file hosted on SharePoint.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 border-l-4 border-blue-500 rounded">
+                    <p class="font-bold">Real-Time Monitoring</p>
+                    <p class="text-sm">Identify delays and track progress live.</p>
+                </div>
+                <div class="bg-blue-50 p-4 border-l-4 border-blue-500 rounded">
+                    <p class="font-bold">Refresh Rate</p>
+                    <p class="text-sm">Dashboard updates every <strong>5 minutes</strong> based on the latest saved Excel data.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="datasource" class="content-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center"><i class="fas fa-file-excel mr-2 text-green-600"></i> 2) Data source (Excel on SharePoint)</h3>
+            <p>The system relies on two key tabs within the SharePoint Excel file:</p>
+            <ul class="list-disc ml-6 mt-2 space-y-1">
+                <li><strong>Task List:</strong> Main database of cutover activities.</li>
+                <li><strong>Phases / Schedule:</strong> Timeline definitions (Planned windows).</li>
+            </ul>
+            <div class="img-container">
+                <img src="CalendarSubphase.png" alt="Excel Schedule Config">
+                <p class="text-xs p-2 text-gray-500 italic text-center">Reference: Phases / Schedule tab logic</p>
+            </div>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="fields" class="content-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center"><i class="fas fa-check-double mr-2 text-orange-600"></i> 3) Required Fields</h3>
+            <p class="mb-4">Every task MUST have the following fields filled to ensure KPI accuracy:</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <div class="p-3 border rounded shadow-sm text-center">Phase & Sub-Phase</div>
+                <div class="p-3 border rounded shadow-sm text-center">Start Date & Time</div>
+                <div class="p-3 border rounded shadow-sm text-center">End Date & Time</div>
+                <div class="p-3 border rounded shadow-sm text-center">Progress (0-100%)</div>
+                <div class="p-3 border rounded shadow-sm text-center">Country</div>
+                <div class="p-3 border rounded shadow-sm text-center">UAT Flag (if app.)</div>
+            </div>
+            <div class="img-container">
+                <img src="TasksExcelFile.png" alt="Task List Structure">
+                <p class="text-xs p-2 text-gray-500 italic text-center">Reference: Task List column layout</p>
+            </div>
+            <div class="alert-box mt-4">
+                <p class="font-bold text-red-700 underline mb-2">CRITICAL: Avoid these data errors</p>
+                <ul class="text-sm list-disc ml-4 space-y-1 text-red-800">
+                    <li>Start date later than end date.</li>
+                    <li>Missing dates or missing hours.</li>
+                    <li>Tasks placed in "Off dashboard" phases.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section 7 (Links) -->
+        <section id="links" class="content-card bg-gray-50 border-2 border-dashed border-gray-300 text-center">
+            <h3 class="text-xl font-bold mb-6">7) Access Links</h3>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="https://jbsusafoodcompany.sharepoint.com/:x:/r/sites/S4HANA/_layouts/15/doc2.aspx?sourcedoc=%7B883B6495-9F54-418A-835A-781A108FC64D%7D&file=S4%20Wave%205%20Cutover%20Plan%20Go%20Live.xlsx&action=default&mobileredirect=true" 
+                   class="bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg font-bold transition flex items-center justify-center">
+                    <i class="fas fa-file-excel mr-2"></i> Excel (SharePoint)
+                </a>
+                <a href="https://qlik.jbssa.com/sense/app/600f5525-dd9c-47c6-89fe-d2464980cb16/" 
+                   class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-bold transition flex items-center justify-center">
+                    <i class="fas fa-chart-line mr-2"></i> Qlik Dashboard
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="overview" class="content-card">
+            <h3 class="text-xl font-bold mb-4 flex items-center"><i class="fas fa-desktop mr-2 text-indigo-600"></i> 8) Executive Overview</h3>
+            <p class="mb-4">Designed for a <strong>Left → Right</strong> and <strong>Top → Bottom</strong> reading flow.</p>
+            
+            <div class="img-container">
+                <img src="ExecutiveOverView.png" alt="Main Dashboard Screenshot">
+                <p class="text-xs p-2 text-gray-500 italic text-center">Main Interface: Executive Overview Page</p>
+            </div>
+
+            <div class="space-y-6 mt-6">
+                <div class="border-l-4 border-indigo-500 pl-4">
+                    <h4 class="font-bold text-indigo-900">A) Filters (Context)</h4>
+                    <p class="text-sm">Located top-right. Choose <strong>Stage</strong> (UAT/Go-Live) and <strong>Country</strong>. This context resets all KPIs instantly.</p>
+                </div>
+                <div class="border-l-4 border-indigo-500 pl-4">
+                    <h4 class="font-bold text-indigo-900">B) Main KPIs</h4>
+                    <ul class="text-sm list-disc ml-4">
+                        <li><strong>Total Progress:</strong> Weighted average (longer tasks carry more impact).</li>
+                        <li><strong>Time Elapsed:</strong> % of the window already consumed.</li>
+                        <li><strong>Countdown:</strong> Remaining time until the context end date.</li>
+                        <li><strong>Status:</strong> Automatically flagged as <span class="text-green-600 font-bold">On Track</span>, <span class="text-orange-500 font-bold">At Risk</span>, or <span class="text-red-600 font-bold">Late</span>.</li>
+                    </ul>
+                </div>
+                <div class="border-l-4 border-indigo-500 pl-4">
+                    <h4 class="font-bold text-indigo-900">C) Action Table</h4>
+                    <p class="text-sm">The bottom section shows the "Overdue activities (Action Required)" list. Use this for daily follow-ups with owners.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="qa" class="content-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold flex items-center text-red-700"><i class="fas fa-notes-medical mr-2"></i> 9) Data Health & QA</h3>
+                <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-red-200">Validation Tab</span>
+            </div>
+            <p class="mb-4 text-gray-700 italic font-medium">"If the data is wrong, the KPIs are wrong."</p>
+            
+            <div class="img-container">
+                <img src="DataHealth.png" alt="Data Health QA">
+                <p class="text-xs p-2 text-gray-500 italic text-center">Reference: Data Quality Issues Report</p>
+            </div>
+
+            <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200 mt-6">
+                <h4 class="font-bold mb-2">Expected Action:</h4>
+                <ol class="list-decimal ml-6 space-y-2 text-sm">
+                    <li>Identify the task in the <strong>Data Quality Issues</strong> table.</li>
+                    <li>Open Excel source file.</li>
+                    <li>Correct the specific row (check dates, phases, or missing info).</li>
+                    <li>Save Excel and wait 5 minutes for refresh.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Best Practices & Footer -->
+        <section id="best-practices" class="content-card bg-green-50 border border-green-200">
+            <h3 class="text-xl font-bold mb-4 flex items-center text-green-800"><i class="fas fa-star mr-2"></i> 10) Best Practices</h3>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <li class="flex items-start"><i class="fas fa-check text-green-600 mt-1 mr-2"></i> Update % Progress multiple times a day during critical windows.</li>
+                <li class="flex items-start"><i class="fas fa-check text-green-600 mt-1 mr-2"></i> Keep Start/End hours realistic to actual plan.</li>
+                <li class="flex items-start"><i class="fas fa-check text-green-600 mt-1 mr-2"></i> Use the "UAT = X" rule consistently.</li>
+                <li class="flex items-start"><i class="fas fa-check text-green-600 mt-1 mr-2"></i> Never leave required fields blank.</li>
+            </ul>
+        </section>
+
+        <!-- Section 11 -->
+        <section id="troubleshoot" class="mb-20 px-4">
+            <h3 class="text-xl font-bold mb-4">11) Quick Troubleshooting</h3>
+            <div class="space-y-4">
+
+                    <summary class="font-bold">"My task is missing from the dashboard"</summary>
+                    <p class="mt-2 text-sm text-gray-600">Check: Is the Phase/Sub-Phase filled? Is it marked "Off dashboard"? Is the Country correct? Did you mark UAT with an "X"?</p>
+
+
+                    <summary class="font-bold">"Overdue count looks too high"</summary>
+                    <p class="mt-2 text-sm text-gray-600">Check for typos in the end dates or tasks that are done but still show progress < 100%.</p>
+
+            </div>
+        </section>
+
+        <footer class="text-center text-gray-400 text-sm py-10 border-t">
+            <p>&copy; 2026 S/4HANA Project Team - Wave 5 Cutover Management</p>
+            <p class="mt-1">Generated for Production Use</p>
+        </footer>
+    </main>
+
+    <script>
+        // Simple scroll spy effect or logic can be added here
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
